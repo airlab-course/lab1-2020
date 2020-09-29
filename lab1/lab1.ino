@@ -1,66 +1,57 @@
-#include <Arduino.h>
-#include <MD_TCS230.h>
+#include "pitches.h"
 
-#define  S0_OUT  2
-#define  S1_OUT  3
-#define  S2_OUT  4
-#define  S3_OUT  5
+#define PIN_BUTTON_A 3
+#define PIN_BUTTON_B 4
+#define PIN_BUTTON_C 5
+#define PIN_BUTTON_D 6
+#define PIN_BUTTON_E 7
+#define PIN_BUTTON_F 8
+#define PIN_BUTTON_G 9
+#define PIN_BUTTON_H 10
 
-#define R_OUT 6
-#define G_OUT 7
-#define B_OUT 8
+#define PIN_BUZZER 11
+#define LED 13
 
-MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
+typedef struct { 
+    int pin;
+    int note;
+} pinNote;
+
+const pinNote pinToNote[] {
+    {PIN_BUTTON_A, NOTE_A4},
+    {PIN_BUTTON_B, NOTE_B4},
+    {PIN_BUTTON_C, NOTE_C4},
+    {PIN_BUTTON_D, NOTE_D4},
+    {PIN_BUTTON_E, NOTE_E4},
+    {PIN_BUTTON_F, NOTE_F4},
+    {PIN_BUTTON_G, NOTE_G4}
+};
 
 void setup()
 {
-    Serial.begin(115200);
-    Serial.println("Started!");
+    pinMode(LED, OUTPUT);
 
-    sensorData whiteCalibration;
-    whiteCalibration.value[TCS230_RGB_R] = 0;
-    whiteCalibration.value[TCS230_RGB_G] = 0;
-    whiteCalibration.value[TCS230_RGB_B] = 0;
+    for(int i = 0; i < sizeof(pinToNote)/sizeof(pinNote); ++i) {
+        int pin = pinToNote[i].pin;
+        pinMode(pin, INPUT);
+        digitalWrite(pin, HIGH);
+    }
 
-    sensorData blackCalibration;
-    blackCalibration.value[TCS230_RGB_R] = 0;
-    blackCalibration.value[TCS230_RGB_G] = 0;
-    blackCalibration.value[TCS230_RGB_B] = 0;
-
-    colorSensor.begin();
-    colorSensor.setDarkCal(&blackCalibration);
-    colorSensor.setWhiteCal(&whiteCalibration);
-
-    pinMode(R_OUT, OUTPUT);
-    pinMode(G_OUT, OUTPUT);
-    pinMode(B_OUT, OUTPUT);
+    digitalWrite(LED,LOW);
 }
 
-void loop() 
+void loop()
 {
-    colorData rgb;
-    colorSensor.read();
+    for(int i = 0; i < sizeof(pinToNote)/sizeof(pinNote); ++i) {
+        pinNote pinNote = pinToNote[i];
+        while(digitalRead(pinNote.pin) == LOW)
+        {
+            tone(PIN_BUZZER, pinNote.note);
+            digitalWrite(LED, HIGH);
+        }
+        
+    }
 
-    while (!colorSensor.available());
-
-    colorSensor.getRGB(&rgb);
-    print_rgb(rgb);
-    set_rgb_led(rgb);
-}
-
-void print_rgb(colorData rgb)
-{
-  Serial.print(rgb.value[TCS230_RGB_R]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_G]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_B]);
-  Serial.println();
-}
-
-void set_rgb_led(colorData rgb)
-{
-    analogWrite(R_OUT, 255 - rgb.value[TCS230_RGB_R]);
-    analogWrite(G_OUT, 255 - rgb.value[TCS230_RGB_G]);
-    analogWrite(B_OUT, 255 - rgb.value[TCS230_RGB_B]);
+    noTone(PIN_BUZZER);
+    digitalWrite(LED,LOW);
 }
