@@ -1,66 +1,75 @@
-#include <Arduino.h>
-#include <MD_TCS230.h>
+int LED_128[] = {13, 12, 11};
+int LED_64[] = {10, 9, 8};
+int LED_32[] = {7, 6, 5};
+int LED_16[] = {4, 3, 2};
+int LED_8[] = {32, 30, 28};
+int LED_4[] = {26, 24, 22};
+int LED_2[] = {27, 25, 23};
+int LED_1[] = {33, 31, 29};
 
-#define  S0_OUT  2
-#define  S1_OUT  3
-#define  S2_OUT  4
-#define  S3_OUT  5
-
-#define R_OUT 6
-#define G_OUT 7
-#define B_OUT 8
-
-MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
+int bin[8];
 
 void setup()
 {
-    Serial.begin(115200);
-    Serial.println("Started!");
-
-    sensorData whiteCalibration;
-    whiteCalibration.value[TCS230_RGB_R] = 0;
-    whiteCalibration.value[TCS230_RGB_G] = 0;
-    whiteCalibration.value[TCS230_RGB_B] = 0;
-
-    sensorData blackCalibration;
-    blackCalibration.value[TCS230_RGB_R] = 0;
-    blackCalibration.value[TCS230_RGB_G] = 0;
-    blackCalibration.value[TCS230_RGB_B] = 0;
-
-    colorSensor.begin();
-    colorSensor.setDarkCal(&blackCalibration);
-    colorSensor.setWhiteCal(&whiteCalibration);
-
-    pinMode(R_OUT, OUTPUT);
-    pinMode(G_OUT, OUTPUT);
-    pinMode(B_OUT, OUTPUT);
+  led_output(LED_128);
+  led_output(LED_64);
+  led_output(LED_32);
+  led_output(LED_16);
+  led_output(LED_8);
+  led_output(LED_4);
+  led_output(LED_2);
+  led_output(LED_1);
 }
 
 void loop() 
 {
-    colorData rgb;
-    colorSensor.read();
-
-    while (!colorSensor.available());
-
-    colorSensor.getRGB(&rgb);
-    print_rgb(rgb);
-    set_rgb_led(rgb);
+  int number = readInput();
+  convert_to_bin(number);
+  bin_to_led();
 }
 
-void print_rgb(colorData rgb)
+void led_output(int led[])
 {
-  Serial.print(rgb.value[TCS230_RGB_R]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_G]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_B]);
-  Serial.println();
+  for(int i = 0; i < 3; i++)
+  {
+    pinMode(led[i], OUTPUT);
+  }
 }
 
-void set_rgb_led(colorData rgb)
+
+int readInput()
 {
-    analogWrite(R_OUT, 255 - rgb.value[TCS230_RGB_R]);
-    analogWrite(G_OUT, 255 - rgb.value[TCS230_RGB_G]);
-    analogWrite(B_OUT, 255 - rgb.value[TCS230_RGB_B]);
+    while (!Serial.available());
+    return Serial.parseInt();
+}
+
+void convert_to_bin(int num)
+{
+  int index = 7;
+  while (num > 0)
+  {
+    bin[index] = num%2;
+    num /= 2;
+    index--;
+  }
+}
+
+void bin_to_led()
+{
+  set_led(LED_128, bin[0]);
+  set_led(LED_64, bin[1]);
+  set_led(LED_32, bin[2]);
+  set_led(LED_16, bin[3]);
+  set_led(LED_8, bin[4]);
+  set_led(LED_4, bin[5]);
+  set_led(LED_2, bin[6]);
+  set_led(LED_1, bin[7]);
+}
+
+void set_led(int led[], bool on)
+{
+  for(int i = 0; i < 3; i++)
+  {
+    digitalWrite(led[i], 1*on);
+  }
 }
