@@ -31,15 +31,14 @@ void setup() {
 }
 
 void loop() {
-    if (buttonToggle.wasPressed()){
+    if (buttonToggle.wasPressed())
       isAlarmOn = !isAlarmOn;
-      if (isAlarmOn) {
-        for (int i = 0; i < BUZZERS_COUNT; i++){
-          buzzers[i].turnSoundOn();
-          buzzers[i].playSound();
-          buzzers[i].turnSoundOff();
-          delay(250);
-        }    
-      }
+    if (isAlarmOn) {
+      for (int i = 0; i < BUZZERS_COUNT; i++) {
+        buzzers[i].turnSoundOn();
+        buzzers[i].playSound();
+        buzzers[i].turnSoundOff();
+        delay(250);
+      }    
     }
 }
