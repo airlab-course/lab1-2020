@@ -2,27 +2,44 @@
 #include "button.h"
 #include "buzzer.h"
 
-#define PIN_BUZZER 6
-#define PIN_BUTTON_OFF 5
+#define PIN_FIRST_BUZZER 8
+#define PIN_SECOND_BUZZER 9
+#define PIN_THIRD_BUZZER 10
+#define PIN_FOURTH_BUZZER 11
 
-Button buttonOff(PIN_BUTTON_OFF);
-Buzzer buzzer(PIN_BUZZER);
+#define BUZZERS_COUNT = 4;
+Buzzer firstBuzzer(PIN_FIRST_BUZZER);
+Buzzer secondBuzzer(PIN_SECOND_BUZZER);
+Buzzer thirdBuzzer(PIN_THIRD_BUZZER);
+Buzzer fourthBuzzer(PIN_FOURTH_BUZZER);
+Buzzer[] buzzers = {firstBuzzer, secondBuzzer, thirdBuzzer, fourthBazzer};
 
+#define PIN_BUTTON_TOGGLE 5
+Button buttonToggle(PIN_BUTTON_OFF);
 
-int notes[] = {NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_DS3, NOTE_SILENCE};
-double durations[] = {8, 8, 1, 8, 1, 8, 1, 24};
-int melodyLength = 8;
+int melodyLength = 1;
+int notes[] = {NOTE_G3};
+double durations[] = {50};
+
+bool isAlarmOn = false;
 
 void setup() {
-    buzzer.setMelody(notes, durations, melodyLength);
-    buzzer.turnSoundOn();
+    firstBuzzer.setMelody(notes, durations, melodyLength);
+    secondBuzzer.setMelody(notes, durations, melodyLength);
+    thirdBuzzer.setMelody(notes, durations, melodyLength);
+    fourthBuzzer.setMelody(notes, durations, melodyLength);
 }
 
 void loop() {
-  
-    buzzer.playSound();
-    if (buttonOff.wasPressed())
-    {
-        buzzer.turnSoundOff();
+    if (buttonToggle.wasPressed()){
+      isAlarmOn = !isAlarmOn;
+      if (isAlarmOn) {
+        for (int i = 0; i < BUZZERS_COUNT; i++){
+          buzzers[i].turnSoundOn();
+          buzzers[i].playSound();
+          buzzers[i].turnSoundOff();
+          delay(250);
+        }    
+      }
     }
 }
