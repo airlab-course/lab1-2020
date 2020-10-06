@@ -1,66 +1,51 @@
-#include <Arduino.h>
-#include <MD_TCS230.h>
+#include "button.h"
 
-#define  S0_OUT  2
-#define  S1_OUT  3
-#define  S2_OUT  4
-#define  S3_OUT  5
+#define PIN_BUTTON_R_IN_MORE 8
+#define PIN_BUTTON_G_IN_MORE 9
+#define PIN_BUTTON_B_IN_MORE 10
 
-#define R_OUT 6
-#define G_OUT 7
-#define B_OUT 8
+#define PIN_BUTTON_R_IN_LESS 11
+#define PIN_BUTTON_G_IN_LESS 12
+#define PIN_BUTTON_B_IN_LESS 13
 
-MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
+#define R_OUT 2
+#define G_OUT 3
+#define B_OUT 4
 
-void setup()
+Button buttonRedMore(PIN_BUTTON_R_IN_MORE);
+Button buttonGreenMore(PIN_BUTTON_G_IN_MORE);
+Button buttonBlueMore(PIN_BUTTON_B_IN_MORE);
+
+Button buttonRedLess(PIN_BUTTON_R_IN_LESS);
+Button buttonGreenLess(PIN_BUTTON_G_IN_LESS);
+Button buttonBlueLess(PIN_BUTTON_B_IN_LESS);
+
+void set_rgb_led(int R, int G, int B)
 {
-    Serial.begin(115200);
-    Serial.println("Started!");
+    analogWrite(R_OUT, 255 - R);
+    analogWrite(G_OUT, 255 - G);
+    analogWrite(B_OUT, 255 - B);
+}
 
-    sensorData whiteCalibration;
-    whiteCalibration.value[TCS230_RGB_R] = 0;
-    whiteCalibration.value[TCS230_RGB_G] = 0;
-    whiteCalibration.value[TCS230_RGB_B] = 0;
-
-    sensorData blackCalibration;
-    blackCalibration.value[TCS230_RGB_R] = 0;
-    blackCalibration.value[TCS230_RGB_G] = 0;
-    blackCalibration.value[TCS230_RGB_B] = 0;
-
-    colorSensor.begin();
-    colorSensor.setDarkCal(&blackCalibration);
-    colorSensor.setWhiteCal(&whiteCalibration);
-
+void setup() {
     pinMode(R_OUT, OUTPUT);
     pinMode(G_OUT, OUTPUT);
     pinMode(B_OUT, OUTPUT);
 }
 
-void loop() 
-{
-    colorData rgb;
-    colorSensor.read();
-
-    while (!colorSensor.available());
-
-    colorSensor.getRGB(&rgb);
-    print_rgb(rgb);
-    set_rgb_led(rgb);
-}
-
-void print_rgb(colorData rgb)
-{
-  Serial.print(rgb.value[TCS230_RGB_R]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_G]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_B]);
-  Serial.println();
-}
-
-void set_rgb_led(colorData rgb)
-{
-    analogWrite(R_OUT, 255 - rgb.value[TCS230_RGB_R]);
-    analogWrite(G_OUT, 255 - rgb.value[TCS230_RGB_G]);
-    analogWrite(B_OUT, 255 - rgb.value[TCS230_RGB_B]);
+void loop() {
+    int R = 0, G = 0, B = 0;
+    if (buttonRedMore.wasPressed() && R < 255)
+        R++;
+    if (buttonRedLess.wasPressed() && R > 0)
+        R--;
+    if (buttonGreenMore.wasPressed() && G < 255)
+        G++;
+    if (buttonGreenLess.wasPressed() && G > 0)
+        G--;
+    if (buttonBlueMore.wasPressed() && B < 255)
+        B++;
+    if (buttonBlueLess.wasPressed() && B > 0)
+        B--;
+    set_rgb_led(R,G,B);
 }
