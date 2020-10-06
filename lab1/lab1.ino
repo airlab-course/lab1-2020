@@ -1,36 +1,52 @@
-#include "pitches.h"
-#include "button.h"
-#include "buzzer.h"
 #include <Arduino.h>
 #include <MD_TCS230.h>
+#include "pitches.h"
+#include "buzzer.h"
 
-#define PIN_BUZZER 6
-#define PIN_BUTTON_OFF 5#define  S0_OUT  2
+#define  S0_OUT  2
 #define  S1_OUT  3
 #define  S2_OUT  4
 #define  S3_OUT  5
-
-#define R_OUT 6
-#define G_OUT 7
-#define B_OUT 8
-
 #define PIN_BUZZER 6
-#define PIN_BUTTON_OFF 5
+#define COLOR_DELTA 10
+#define MAX_RGB_VALUE 255-COLOR_DELTA
 
-Button buttonOff(PIN_BUTTON_OFF);
-Buzzer buzzer(PIN_BUZZER);
+MD_TCS230 color_sensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
+buzzer buzzer(PIN_BUZZER);
 
+struct RGB
+{
+    int red, green, blue;
+    RGB(int r, int g, int b)
+    {
+      red = r;
+      green = g;
+      blue = b;
+    }
+};
 
-int notes[] = {NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_DS3, NOTE_SILENCE};
-double durations[] = {8, 8, 1, 8, 1, 8, 1, 24};
-int melodyLength = 8;
+struct note_color
+{
+  int note;
+  RGB color;
+};
 
-MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
+note_color note_colors[] 
+{
+  {NOTE_C4, RGB(0, 0, 0)},
+  {NOTE_D4, RGB(MAX_RGB_VALUE, MAX_RGB_VALUE, MAX_RGB_VALUE)},
+  {NOTE_E4, RGB(MAX_RGB_VALUE, 0, 0)},
+  {NOTE_F4, RGB(0, MAX_RGB_VALUE, 0)},
+  {NOTE_G4, RGB(0, 0, MAX_RGB_VALUE)},
+  {NOTE_A4, RGB(MAX_RGB_VALUE, MAX_RGB_VALUE, 0)},
+  {NOTE_B4, RGB(MAX_RGB_VALUE, 0, MAX_RGB_VALUE)}
+};
+int note_colors_length = sizeof(note_colors) / sizeof(*note_colors);
 
 void setup()
 {
-    buzzer.setMelody(notes, durations, melodyLength);
-    buzzer.turnSoundOn();
+    //buzzer.setMelody(notes, durations, melodyLength);
+    //buzzer.turnSoundOn();
     Serial.begin(115200);
     Serial.println("Started!");
 
@@ -44,42 +60,66 @@ void setup()
     blackCalibration.value[TCS230_RGB_G] = 0;
     blackCalibration.value[TCS230_RGB_B] = 0;
 
-    colorSensor.begin();
-    colorSensor.setDarkCal(&blackCalibration);
-    colorSensor.setWhiteCal(&whiteCalibration);
-
-    pinMode(R_OUT, OUTPUT);
-    pinMode(G_OUT, OUTPUT);
-    pinMode(B_OUT, OUTPUT);
+    color_sensor.begin();
+    color_sensor.setDarkCal(&blackCalibration);
+    color_sensor.setWhiteCal(&whiteCalibration);
 }
+
 void loop() 
 {
     colorData rgb;
-    colorSensor.read();
-    buzzer.playSound();
-    if (buttonOff.wasPressed())
-    {
-        buzzer.turnSoundOff();
-    }    while (!colorSensor.available());
-
-    colorSensor.getRGB(&rgb);
+    color_sensor.read();
+    buzzer.play_sound();
+    
+    while (!color_sensor.available()){}
+    color_sensor.getRGB(&rgb);
+    int note = get_note_by_color(rgb);
+    buzzer.set_note_pitch(note);
     print_rgb(rgb);
-    set_rgb_led(rgb);
+}
+
+int get_note_by_color(colorData rgb) 
+{
+  RGB sensor_color = color_data_to_rgb(rgb);
+  for (int i = 0; i < note_colors_length; i++)
+  {
+    if (equal_colors(sensor_color, note_colors[i].color))
+      return note_colors[i].note;
+  }
+
+  return NOTE_SILENCE;
+}
+
+RGB color_data_to_rgb(colorData rgb)
+{
+  int red = rgb.value[TCS230_RGB_R];
+  int green = rgb.value[TCS230_RGB_G];
+  int blue = rgb.value[TCS230_RGB_B];
+  return RGB(red, green, blue);
+}
+
+bool equal_colors(RGB first, RGB second)
+{
+  if (!values_equal_with_delta(first.red, second.red))
+    return false;
+  if (!values_equal_with_delta(first.green, second.green))
+    return false;
+  if (!values_equal_with_delta(first.blue, second.blue))
+    return false;
+  return true;
+}
+
+bool values_equal_with_delta(int first, int second)
+{
+  return abs(first - second) <= COLOR_DELTA;
 }
 
 void print_rgb(colorData rgb)
 {
-  Serial.print(rgb.value[TCS230_RGB_R]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_G]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_B]);
-  Serial.println();
-}
-
-void set_rgb_led(colorData rgb)
-{
-    analogWrite(R_OUT, 255 - rgb.value[TCS230_RGB_R]);
-    analogWrite(G_OUT, 255 - rgb.value[TCS230_RGB_G]);
-    analogWrite(B_OUT, 255 - rgb.value[TCS230_RGB_B]);
+    Serial.print(rgb.value[TCS230_RGB_R]);
+    Serial.print(" ");
+    Serial.print(rgb.value[TCS230_RGB_G]);
+    Serial.print(" ");
+    Serial.print(rgb.value[TCS230_RGB_B]);
+    Serial.println();
 }
