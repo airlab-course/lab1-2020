@@ -63,4 +63,3 @@ void set_rgb_led(colorData rgb)
     analogWrite(R_OUT, 255 - rgb.value[TCS230_RGB_R]);
     analogWrite(G_OUT, 255 - rgb.value[TCS230_RGB_G]);
     analogWrite(B_OUT, 255 - rgb.value[TCS230_RGB_B]);
-}
