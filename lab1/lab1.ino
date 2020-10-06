@@ -45,8 +45,6 @@ int note_colors_length = sizeof(note_colors) / sizeof(*note_colors);
 
 void setup()
 {
-    //buzzer.setMelody(notes, durations, melodyLength);
-    //buzzer.turnSoundOn();
     Serial.begin(115200);
     Serial.println("Started!");
 
@@ -92,9 +90,9 @@ int get_note_by_color(colorData rgb)
 
 RGB color_data_to_rgb(colorData rgb)
 {
-  int red = rgb.value[TCS230_RGB_R];
-  int green = rgb.value[TCS230_RGB_G];
-  int blue = rgb.value[TCS230_RGB_B];
+  int red = 255 - rgb.value[TCS230_RGB_R];
+  int green = 255 - rgb.value[TCS230_RGB_G];
+  int blue = 255 - rgb.value[TCS230_RGB_B];
   return RGB(red, green, blue);
 }
 
