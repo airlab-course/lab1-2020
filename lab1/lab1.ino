@@ -1,28 +1,57 @@
 #include "pitches.h"
-#include "button.h"
-#include "buzzer.h"
 
-#define PIN_BUZZER 6
-#define PIN_BUTTON_OFF 5
+#define PIN_BUTTON_A 3
+#define PIN_BUTTON_B 4
+#define PIN_BUTTON_C 5
+#define PIN_BUTTON_D 6
+#define PIN_BUTTON_E 7
+#define PIN_BUTTON_F 8
+#define PIN_BUTTON_G 9
+#define PIN_BUTTON_H 10
 
-Button buttonOff(PIN_BUTTON_OFF);
-Buzzer buzzer(PIN_BUZZER);
+#define PIN_BUZZER 11
+#define LED 13
 
+typedef struct { 
+    int pin;
+    int note;
+} pinNote;
 
-int notes[] = {NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_DS3, NOTE_SILENCE};
-double durations[] = {8, 8, 1, 8, 1, 8, 1, 24};
-int melodyLength = 8;
+const pinNote pinToNote[] {
+    {PIN_BUTTON_A, NOTE_A4},
+    {PIN_BUTTON_B, NOTE_B4},
+    {PIN_BUTTON_C, NOTE_C4},
+    {PIN_BUTTON_D, NOTE_D4},
+    {PIN_BUTTON_E, NOTE_E4},
+    {PIN_BUTTON_F, NOTE_F4},
+    {PIN_BUTTON_G, NOTE_G4}
+};
 
-void setup() {
-    buzzer.setMelody(notes, durations, melodyLength);
-    buzzer.turnSoundOn();
+void setup()
+{
+    pinMode(LED, OUTPUT);
+
+    for(int i = 0; i < sizeof(pinToNote)/sizeof(pinNote); ++i) {
+        int pin = pinToNote[i].pin;
+        pinMode(pin, INPUT);
+        digitalWrite(pin, HIGH);
+    }
+
+    digitalWrite(LED,LOW);
 }
 
-void loop() {
-  
-    buzzer.playSound();
-    if (buttonOff.wasPressed())
-    {
-        buzzer.turnSoundOff();
+void loop()
+{
+    for(int i = 0; i < sizeof(pinToNote)/sizeof(pinNote); ++i) {
+        pinNote pinNote = pinToNote[i];
+        while(digitalRead(pinNote.pin) == LOW)
+        {
+            tone(PIN_BUZZER, pinNote.note);
+            digitalWrite(LED, HIGH);
+        }
+        
     }
+
+    noTone(PIN_BUZZER);
+    digitalWrite(LED,LOW);
 }
