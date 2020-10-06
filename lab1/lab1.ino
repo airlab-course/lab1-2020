@@ -24,10 +24,9 @@ double durations[] = {50};
 bool isAlarmOn = false;
 
 void setup() {
-    firstBuzzer.setMelody(notes, durations, melodyLength);
-    secondBuzzer.setMelody(notes, durations, melodyLength);
-    thirdBuzzer.setMelody(notes, durations, melodyLength);
-    fourthBuzzer.setMelody(notes, durations, melodyLength);
+    for (int i = 0; i < BUZZERS_COUNT; i++) {
+      buzzers[i].setMelody(notes, durations, melodyLength);
+    }
 }
 
 void loop() {
