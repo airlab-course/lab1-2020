@@ -1,5 +1,6 @@
 #define PIN_LED 12  
 #define BUZZER_PIN 10 
+#include "buzzer.h"
 
 int buttonPin[2] = {3, 13};
 int ledPin[2] = {9, 11};
@@ -13,6 +14,7 @@ void setup()
     pinMode(ledPin[player], OUTPUT);
     pinMode(buttonPin[player], INPUT_PULLUP);
   }
+
 }
  
 void loop()
@@ -29,6 +31,11 @@ void loop()
       digitalWrite(PIN_LED, LOW);
       delay(1000);
       digitalWrite(ledPin[player], LOW);
+    buzzer.playSound();
+    if (buttonOff.wasPressed())
+    {
+        buzzer.turnSoundOff();
+    }
       break; 
     }
   }
