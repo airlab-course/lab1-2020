@@ -1,41 +1,30 @@
-int LED_128[] = {13, 12, 11};
-int LED_64[] = {10, 9, 8};
-int LED_32[] = {7, 6, 5};
-int LED_16[] = {4, 3, 2};
-int LED_8[] = {32, 30, 28};
-int LED_4[] = {26, 24, 22};
-int LED_2[] = {27, 25, 23};
-int LED_1[] = {33, 31, 29};
+#define LED_128 0
+#define LED_64 0
+#define LED_32 0
+#define LED_16 0
+#define LED_8 0
+#define LED_4 0
+#define LED_2 0
+#define LED_1 0
 
-int bin[8];
 
 void setup()
 {
-  led_output(LED_128);
-  led_output(LED_64);
-  led_output(LED_32);
-  led_output(LED_16);
-  led_output(LED_8);
-  led_output(LED_4);
-  led_output(LED_2);
-  led_output(LED_1);
+  pinMode(LED_128, OUTPUT);
+  pinMode(LED_64, OUTPUT);
+  pinMode(LED_32, OUTPUT);
+  pinMode(LED_16, OUTPUT);
+  pinMode(LED_8, OUTPUT);
+  pinMode(LED_4, OUTPUT);
+  pinMode(LED_2, OUTPUT);
+  pinMode(LED_1, OUTPUT);
 }
 
 void loop() 
 {
   int number = readInput();
-  convert_to_bin(number);
-  bin_to_led();
+  num_to_led(number);
 }
-
-void led_output(int led[])
-{
-  for(int i = 0; i < 3; i++)
-  {
-    pinMode(led[i], OUTPUT);
-  }
-}
-
 
 int readInput()
 {
@@ -43,33 +32,19 @@ int readInput()
     return Serial.parseInt();
 }
 
-void convert_to_bin(int num)
+bool is_bit_set(int number, int bit)
 {
-  int index = 7;
-  while (num > 0)
-  {
-    bin[index] = num%2;
-    num /= 2;
-    index--;
-  }
+  return number & 1 << bit;
 }
 
-void bin_to_led()
+void num_to_led(int num)
 {
-  set_led(LED_128, bin[0]);
-  set_led(LED_64, bin[1]);
-  set_led(LED_32, bin[2]);
-  set_led(LED_16, bin[3]);
-  set_led(LED_8, bin[4]);
-  set_led(LED_4, bin[5]);
-  set_led(LED_2, bin[6]);
-  set_led(LED_1, bin[7]);
-}
-
-void set_led(int led[], bool on)
-{
-  for(int i = 0; i < 3; i++)
-  {
-    digitalWrite(led[i], 1*on);
-  }
+  digitalWrite(LED_128, is_bit_set(num, 7));
+  digitalWrite(LED_64, is_bit_set(num, 6));
+  digitalWrite(LED_32, is_bit_set(num, 5));
+  digitalWrite(LED_16, is_bit_set(num, 4));
+  digitalWrite(LED_8, is_bit_set(num, 3));
+  digitalWrite(LED_4, is_bit_set(num, 2));
+  digitalWrite(LED_2, is_bit_set(num, 1));
+  digitalWrite(LED_1, is_bit_set(num, 0));
 }
