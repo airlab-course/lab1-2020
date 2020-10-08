@@ -1,66 +1,64 @@
-#include <Arduino.h>
-#include <MD_TCS230.h>
+#include <buzzer.h>
+#include <button.h>
+#include <pitches.h>
 
-#define  S0_OUT  2
-#define  S1_OUT  3
-#define  S2_OUT  4
-#define  S3_OUT  5
+#define PIN_BUZZER 12  // пин с пищалкой
+#define PIN_BUTTON_ONE 3
+#define PIN_BUTTON_TWO 13
+#define PIN_PLAYER_ONE 9
+#define PIN_PLAYER_TWO 11
 
-#define R_OUT 6
-#define G_OUT 7
-#define B_OUT 8
+Buzzer buzzer(PIN_BUZZER);
 
-MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
+int buttonPins[2] = {3, 13};
+int ledPins[2] = {9, 11};
+int randNumber;
+
+int notes[] = {NOTE_A4, NOTE_G4, NOTE_G4, NOTE_A4};
+double durations[] = {8, 1, 4, 1};
+int melodyLength = 4;
+
+unsigned long speeds[] = {25, 50, 100, 200, 400, 800};
+int currentSpeed = 2;
+int speedsLength = 6;
+
+int notes2[] = {NOTE_C4, NOTE_C4, NOTE_C4, NOTE_DS8, NOTE_DS8, NOTE_DS8, NOTE_C4, NOTE_C4, NOTE_C4};
+double durations2[] = {5, 5, 5, 30, 30, 30, 5, 5, 5};
+int melodyLength2 = 9;
+
+int notes_Start[] = {NOTE_A4};
+double durations_Start[] = {8};
+int melodyLengthStart = 1;
 
 void setup()
 {
-    Serial.begin(115200);
-    Serial.println("Started!");
+  pinMode(9, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(3, INPUT_PULLUP);
+  pinMode(13, INPUT_PULLUP);
 
-    sensorData whiteCalibration;
-    whiteCalibration.value[TCS230_RGB_R] = 0;
-    whiteCalibration.value[TCS230_RGB_G] = 0;
-    whiteCalibration.value[TCS230_RGB_B] = 0;
-
-    sensorData blackCalibration;
-    blackCalibration.value[TCS230_RGB_R] = 0;
-    blackCalibration.value[TCS230_RGB_G] = 0;
-    blackCalibration.value[TCS230_RGB_B] = 0;
-
-    colorSensor.begin();
-    colorSensor.setDarkCal(&blackCalibration);
-    colorSensor.setWhiteCal(&whiteCalibration);
-
-    pinMode(R_OUT, OUTPUT);
-    pinMode(G_OUT, OUTPUT);
-    pinMode(B_OUT, OUTPUT);
 }
-
-void loop() 
+ 
+void loop()
 {
-    colorData rgb;
-    colorSensor.read();
-
-    while (!colorSensor.available());
-
-    colorSensor.getRGB(&rgb);
-    print_rgb(rgb);
-    set_rgb_led(rgb);
-}
-
-void print_rgb(colorData rgb)
-{
-  Serial.print(rgb.value[TCS230_RGB_R]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_G]);
-  Serial.print(" ");
-  Serial.print(rgb.value[TCS230_RGB_B]);
-  Serial.println();
-}
-
-void set_rgb_led(colorData rgb)
-{
-    analogWrite(R_OUT, 255 - rgb.value[TCS230_RGB_R]);
-    analogWrite(G_OUT, 255 - rgb.value[TCS230_RGB_G]);
-    analogWrite(B_OUT, 255 - rgb.value[TCS230_RGB_B]);
+  randNumber = random(2000,6000);
+  delay(randNumber);
+  buzzer.setMelody(notes_Start, durations_Start, melodyLengthStart);
+  buzzer.turnSoundOn();
+  for (int player = 0; ; player = (player + 1) % 2) {
+    if (!digitalRead(buttonPins[player])) {
+      digitalWrite(ledPins[player], HIGH);
+      if (player == 0){
+        buzzer.setMelody(notes, durations, melodyLength);
+        buzzer.turnSoundOn();
+      }
+      else if (player == 1){
+        buzzer.setMelody(notes2, durations2, melodyLength2);
+        buzzer.turnSoundOn();
+      }
+      delay(2000);
+      digitalWrite(ledPins[player], LOW);
+      break;
+    }
+  }
 }
