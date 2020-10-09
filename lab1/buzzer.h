@@ -1,7 +1,5 @@
 #pragma once
 
-#define BUZZER_NOTE_DURATION 100
-
 class Buzzer
 {
 public:
@@ -17,6 +15,7 @@ public:
         notes = 0;
         durations = 0;
         melodyLength = 0;
+        noteDuration = 100;
     }
 
     void turnSoundOn()
@@ -41,12 +40,26 @@ public:
         melodyLength = _melodyLength;
     }
 
+    void speedUp(double speedMultiplier)
+    {
+        double newNoteDuration = noteDuration / speedMultiplier;
+        if (newNoteDuration >= 1)
+        {
+            noteDuration = newNoteDuration;
+        }
+    }
+
+    void speedDown(double speedMultiplier)
+    {
+        noteDuration *= speedMultiplier;
+    }
+
     void playSound()
     {
         if (!isEnabled)
             return;
 
-        unsigned long duration = round(BUZZER_NOTE_DURATION*durations[currentNote]);
+        unsigned long duration = round(noteDuration*durations[currentNote]);
         if ((millis() - noteStartedMs) > duration)
         {
             int note = notes[currentNote];
@@ -71,4 +84,5 @@ private:
     int* notes;
     double* durations;
     int melodyLength;
+    double noteDuration;
 };
