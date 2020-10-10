@@ -2,7 +2,7 @@
 #include <toneAC.h>
 #include "pitches.h"
 
-#define BUZZER_NOTE_DURATION 100
+#define BUZZER_NOTE_DURATION 1000
 
 class buzzer
 {
@@ -23,16 +23,10 @@ public:
 
     void play_sound()
     {
-        unsigned long duration = round(BUZZER_NOTE_DURATION * _duration);
-        if ((millis() - _note_started_ms) > duration)
-        {
-            if (_note == NOTE_SILENCE)
-                noToneAC();
-            else 
-                toneAC(_note, 10, BUZZER_NOTE_DURATION);
-
-            _note_started_ms = millis();
-        }
+        if (_note == NOTE_SILENCE)
+            noToneAC();
+        else 
+            toneAC(_note);
     }
 
 private:
