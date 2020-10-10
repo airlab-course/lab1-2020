@@ -13,13 +13,13 @@ void setup()
   pinMode(R_OUT, OUTPUT);
   pinMode(G_OUT, OUTPUT);
   pinMode(B_OUT, OUTPUT);
-
 }
 
 
 void loop()
 {
-  if (buttonOn.wasPressed()) {
+  if (buttonOn.wasPressed())
+  {
     for (int i = 0; i < 6; i++) {
       set_rgb_led(255, 0, 0);
       delay(4900);
