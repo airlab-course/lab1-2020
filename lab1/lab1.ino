@@ -33,20 +33,20 @@ void setup() {
     pinMode(B_OUT, OUTPUT);
 }
 
-int R = 0, G = 0, B = 0;
+int R = 90, G = 90, B = 90;
 
 void loop() {
     if (buttonRedMore.wasPressed() && R < 255)
-        R++;
+        R += 15;
     if (buttonRedLess.wasPressed() && R > 0)
-        R--;
+        R -= 15;
     if (buttonGreenMore.wasPressed() && G < 255)
-        G++;
+        G += 15;
     if (buttonGreenLess.wasPressed() && G > 0)
-        G--;
+        G -= 15;
     if (buttonBlueMore.wasPressed() && B < 255)
-        B++;
+        B += 15;
     if (buttonBlueLess.wasPressed() && B > 0)
-        B--;
+        B -= 15;
     set_rgb_led(R,G,B);
 }
