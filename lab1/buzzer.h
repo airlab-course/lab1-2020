@@ -1,74 +1,43 @@
 #pragma once
+#include <toneAC.h>
+#include "pitches.h"
 
 #define BUZZER_NOTE_DURATION 100
 
-class Buzzer
+class buzzer
 {
 public:
-    Buzzer(int _pin)
+    buzzer(int pin, double note_duration = 1)
     {
-        pin = _pin;
+        _pin = pin;
         pinMode(pin, OUTPUT);
-
-        isEnabled = false;
-        currentNote = 0;
-        noteStartedMs = 0;
-
-        notes = 0;
-        durations = 0;
-        melodyLength = 0;
+        _note = NOTE_SILENCE;
+        _duration = note_duration;
+        _note_started_ms = 0;
     }
 
-    void turnSoundOn()
+    void set_note_pitch(int note)
     {
-        isEnabled = true;
-        currentNote = 0;
-        noteStartedMs = 0;
+        _note = note;
     }
 
-    void turnSoundOff()
+    void play_sound()
     {
-        isEnabled = false;
-        currentNote = 0;
-        noteStartedMs = 0;
-        noTone(pin);
-    }
-
-    void setMelody(int _notes[], double _durations[], int _melodyLength)
-    {
-        notes = _notes;
-        durations = _durations;
-        melodyLength = _melodyLength;
-    }
-
-    void playSound()
-    {
-        if (!isEnabled)
-            return;
-
-        unsigned long duration = round(BUZZER_NOTE_DURATION*durations[currentNote]);
-        if ((millis() - noteStartedMs) > duration)
+        unsigned long duration = round(BUZZER_NOTE_DURATION * _duration);
+        if ((millis() - _note_started_ms) > duration)
         {
-            int note = notes[currentNote];
-            
-            if (note == NOTE_SILENCE)
-                noTone(pin);
+            if (_note == NOTE_SILENCE)
+                noToneAC();
             else 
-                tone(pin, notes[currentNote]);
+                toneAC(_note, 10, BUZZER_NOTE_DURATION);
 
-            noteStartedMs = millis();
-            currentNote = (currentNote + 1)%melodyLength;
+            _note_started_ms = millis();
         }
     }
 
 private:
-    int pin;
-    bool isEnabled;
-
-    int currentNote;
-    unsigned long noteStartedMs;
-
-    int* notes;
-    double* durations;
-    int melodyLength;
+    int _pin;
+    int _note;
+    unsigned long _note_started_ms;
+    double _duration;
 };
