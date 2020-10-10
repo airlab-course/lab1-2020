@@ -36,7 +36,7 @@ void setup()
     pinMode(B_OUT, OUTPUT);
 }
 
-void loop() 
+void loop()
 {
     colorData rgb;
     colorSensor.read();
