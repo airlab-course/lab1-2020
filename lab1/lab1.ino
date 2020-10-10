@@ -22,7 +22,7 @@ void loop()
   if (buttonOn.wasPressed()) {
     for (int i = 0; i < 6; i++) {
       set_rgb_led(255, 0, 0);
-      delay(5000);
+      delay(4900);
       set_rgb_led(255, 255, 255);
       delay(100);
     }
