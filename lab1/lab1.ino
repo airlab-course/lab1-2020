@@ -1,15 +1,15 @@
 #define ledsCount 6
 
 void ledPin(int firstLed, int secondLed){
-  for (int fadeValue = 0 ; fadeValue <= 255; fadeValue += 5) {
-    analogWrite(firstLed, fadeValue);
-    analogWrite(secondLed, fadeValue);
-    delay(30);
-  }
   for (int fadeValue = 255 ; fadeValue >= 0; fadeValue -= 5) {
     analogWrite(firstLed, fadeValue);
     analogWrite(secondLed, fadeValue);
-    delay(30);
+    delay(5);
+  }
+  for (int fadeValue = 0 ; fadeValue <= 255; fadeValue += 5) {
+    analogWrite(firstLed, fadeValue);
+    analogWrite(secondLed, fadeValue);
+    delay(5);
   }
 }
 
@@ -24,6 +24,12 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(2,HIGH);
+  digitalWrite(3,HIGH);
+  digitalWrite(4,HIGH);
+  digitalWrite(5,HIGH);
+  digitalWrite(6,HIGH);
+  digitalWrite(7,HIGH);
   for (int i = 0; i < 3; i++){
     ledPin(leds[i],leds[i+3]);
   }
