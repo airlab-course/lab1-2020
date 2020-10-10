@@ -20,11 +20,11 @@ Button buttonRedLess(PIN_BUTTON_R_IN_LESS);
 Button buttonGreenLess(PIN_BUTTON_G_IN_LESS);
 Button buttonBlueLess(PIN_BUTTON_B_IN_LESS);
 
-void set_rgb_led(int R, int G, int B)
+void set_rgb_led(int Red, int Green, int Blue)
 {
-    analogWrite(R_OUT, 255 - R);
-    analogWrite(G_OUT, 255 - G);
-    analogWrite(B_OUT, 255 - B);
+    analogWrite(R_OUT, 255 - Red);
+    analogWrite(G_OUT, 255 - Green);
+    analogWrite(B_OUT, 255 - Blue);
 }
 
 void setup() {
@@ -33,8 +33,9 @@ void setup() {
     pinMode(B_OUT, OUTPUT);
 }
 
+int R = 0, G = 0, B = 0;
+
 void loop() {
-    int R = 0, G = 0, B = 0;
     if (buttonRedMore.wasPressed() && R < 255)
         R++;
     if (buttonRedLess.wasPressed() && R > 0)
