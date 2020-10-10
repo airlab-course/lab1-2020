@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <MD_TCS230.h>
+#include "button.h"
 
 #define  S0_OUT  2
 #define  S1_OUT  3
@@ -13,7 +13,7 @@
 
 Button buttonOn(PIN_BUTTON_ON);
 
-MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
+//MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
 
 void setup()
 {
