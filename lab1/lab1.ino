@@ -1,19 +1,12 @@
 #include <Arduino.h>
 #include "button.h"
 
-#define  S0_OUT  2
-#define  S1_OUT  3
-#define  S2_OUT  4
-#define  S3_OUT  5
-
 #define R_OUT 6
 #define G_OUT 7
 #define B_OUT 8
 #define PIN_BUTTON_ON 9
 
 Button buttonOn(PIN_BUTTON_ON);
-
-//MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
 
 void setup()
 {
