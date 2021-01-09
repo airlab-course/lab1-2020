@@ -1,5 +1,8 @@
 #include <Arduino.h>
 #include <MD_TCS230.h>
+#include "pitches.h"                                                                                                    
+#include "button.h"                                                                                                     
+#include "buzzer.h" 
 
 #define  S0_OUT  2
 #define  S1_OUT  3
@@ -9,6 +12,17 @@
 #define R_OUT 6
 #define G_OUT 7
 #define B_OUT 8
+
+#define PIN_BUZZER 6                                                                                                    
+#define PIN_BUTTON_OFF 5                                                                                                
+
+Button buttonOff(PIN_BUTTON_OFF);                                                                                       
+Buzzer buzzer(PIN_BUZZER);                                                                                              
+                                                                                                                         
+                                                                                                                         
+int notes[] = {NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_DS3, NOTE_SILENCE};            
+double durations[] = {8, 8, 1, 8, 1, 8, 1, 24};                                                                         
+int melodyLength = 8;                                 
 
 MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
 
@@ -46,6 +60,13 @@ void loop()
     colorSensor.getRGB(&rgb);
     print_rgb(rgb);
     set_rgb_led(rgb);
+    buzzer.playSound();                                                           
+    if (buttonOff.wasPressed())                                                                                         
+    {                                                                                                                   
+        buzzer.turnSoundOff();                                                                                          
+    }
+    buzzer.setMelody(notes, durations, melodyLength);
+    buzzer.turnSoundOn();
 }
 
 void print_rgb(colorData rgb)
