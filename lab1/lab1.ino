@@ -13,10 +13,11 @@
 #define PIN_BUTTON 5
 
 Button button(PIN_BUTTON);
+const int SIZE = 8;
 bool isWaveActive = false;
-bool isUpDirection[8] = { false, true, true, false, false, true, true, false };
-int outputs[8] = {2, 3, 4, 6, 7, 8, 9, 10};
-int brightnesses[8] = { 128, 1, 128, 255, 128, 1, 128, 255};
+bool isUpDirection[SIZE] = { false, true, true, false, false, true, true, false };
+int outputs[SIZE] = {2, 3, 4, 6, 7, 8, 9, 10};
+int brightnesses[SIZE] = { 128, 1, 128, 255, 128, 1, 128, 255};
 
 void setMode(int output, int brightness)
 {
@@ -25,7 +26,7 @@ void setMode(int output, int brightness)
 
 void doWaveAction()
 {
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < SIZE; i++) {
         setMode(outputs[i], brightnesses[i]);
         if (brightnesses[i] == 255 && isUpDirection[i] || brightnesses[i] == 0 && !isUpDirection[i])
         {
@@ -45,7 +46,7 @@ void doWaveAction()
 
 void setup()
 {
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < SIZE; i++)
     {
         pinMode(outputs[i], OUTPUT);
     }
