@@ -1,94 +1,39 @@
-<<<<<<< HEAD
-#include <buzzer.h>
-#include <button.h>
-#include <pitches.h>
-
-#define PIN_BUZZER 12  // пин с пищалкой
-#define PIN_BUTTON_ONE 3
-#define PIN_BUTTON_TWO 13
-#define PIN_PLAYER_ONE 9
-#define PIN_PLAYER_TWO 11
-
-Buzzer buzzer(PIN_BUZZER);
-
-int buttonPins[2] = {3, 13};
-int ledPins[2] = {9, 11};
-int randNumber;
-
-int notes[] = {NOTE_A4, NOTE_G4, NOTE_G4, NOTE_A4};
-double durations[] = {8, 1, 4, 1};
-int melodyLength = 4;
-
-unsigned long speeds[] = {25, 50, 100, 200, 400, 800};
-int currentSpeed = 2;
-int speedsLength = 6;
-
-int notes2[] = {NOTE_C4, NOTE_C4, NOTE_C4, NOTE_DS8, NOTE_DS8, NOTE_DS8, NOTE_C4, NOTE_C4, NOTE_C4};
-double durations2[] = {5, 5, 5, 30, 30, 30, 5, 5, 5};
-int melodyLength2 = 9;
-
-int notes_Start[] = {NOTE_A4};
-double durations_Start[] = {8};
-int melodyLengthStart = 1;
-
+#define PIN_LED 12  // пин с пищалкой
+#define PLAYER_COUNT 2   // количество игроков-ковбоев
+// вместо перечисления всех пинов по-одному, мы объявляем пару
+// списков: один с номерами пинов с кнопками, другой — со
+// светодиодами. Списки также называют массивами (англ. array)
+int buttonPins[PLAYER_COUNT] = {3, 13};
+int ledPins[PLAYER_COUNT] = {9, 11};
+int randomNumber;
 void setup()
 {
-  pinMode(9, OUTPUT);
-  pinMode(11, OUTPUT);
-  pinMode(3, INPUT_PULLUP);
-  pinMode(13, INPUT_PULLUP);
-
+  pinMode(PIN_LED, OUTPUT);
+  for (int player = 0; player < PLAYER_COUNT; ++player) {
+    // при помощи квадратных скобок получают значение в массиве
+    // под указанным в них номером. Нумерация начинается с нуля
+    pinMode(ledPins[player], OUTPUT);
+    pinMode(buttonPins[player], INPUT_PULLUP);
+  }
 }
  
 void loop()
 {
-  randNumber = random(2000,6000);
-  delay(randNumber);
-  buzzer.setMelody(notes_Start, durations_Start, melodyLengthStart);
-  buzzer.turnSoundOn();
-  for (int player = 0; ; player = (player + 1) % 2) {
+  // даём сигнал «пли!», выждав случайное время от 2 до 7 сек
+  randomNumber = random(2000,6000);
+  delay(randomNumber);
+  digitalWrite(PIN_LED, HIGH);
+ 
+  for (int player = 0; ; player = (player+1) % PLAYER_COUNT) {
+    // если игрок номер «player» нажал кнопку...
     if (!digitalRead(buttonPins[player])) {
+      // ...включаем его светодиод и сигнал победы на 1 сек
       digitalWrite(ledPins[player], HIGH);
-      if (player == 0){
-        buzzer.setMelody(notes, durations, melodyLength);
-        buzzer.turnSoundOn();
-      }
-      else if (player == 1){
-        buzzer.setMelody(notes2, durations2, melodyLength2);
-        buzzer.turnSoundOn();
-      }
-      delay(2000);
+      digitalWrite(PIN_LED, LOW);
+
+      delay(1000);
       digitalWrite(ledPins[player], LOW);
-      break;
+      break; // Есть победитель! Выходим (англ. break) из цикла
     }
   }
-=======
-#include "pitches.h"
-#include "button.h"
-#include "buzzer.h"
-
-#define PIN_BUZZER 6
-#define PIN_BUTTON_OFF 5
-
-Button buttonOff(PIN_BUTTON_OFF);
-Buzzer buzzer(PIN_BUZZER);
-
-
-int notes[] = {NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_G3, NOTE_SILENCE, NOTE_DS3, NOTE_SILENCE};
-double durations[] = {8, 8, 1, 8, 1, 8, 1, 24};
-int melodyLength = 8;
-
-void setup() {
-    buzzer.setMelody(notes, durations, melodyLength);
-    buzzer.turnSoundOn();
-}
-
-void loop() {
-  
-    buzzer.playSound();
-    if (buttonOff.wasPressed())
-    {
-        buzzer.turnSoundOff();
-    }
->>>>>>> buzzer-and-buttons
 }
