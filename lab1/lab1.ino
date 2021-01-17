@@ -1,75 +1,54 @@
 #include <Arduino.h>
 #include "button.h"
 
-#define R1_OUT 2
-#define G1_OUT 3
-#define B1_OUT 4
-
-#define R2_OUT 6
-#define G2_OUT 7
-#define B2_OUT 8
-
-#define R3_OUT 9
-#define G3_OUT 10
-#define B3_OUT 11
+#define OUT1 2
+#define OUT2 3
+#define OUT3 4
+#define OUT4 6
+#define OUT5 7
+#define OUT6 8
+#define OUT7 9
+#define OUT8 10
 
 #define PIN_BUTTON 5
 
 Button button(PIN_BUTTON);
 bool isWaveActive = false;
-int counters[3] = { 0, 2, 1 };
+bool isUpDirection[8] = { false, true, true, false, false, true, true, false };
+int outputs[8] = {2, 3, 4, 6, 7, 8, 9, 10};
+int brightnesses[8] = { 128, 1, 128, 255, 128, 1, 128, 255};
 
-void setMode(int mode, int r, int g, int b)
+void setMode(int output, int brightness)
 {
-  if (mode == 2)
-  {
-    digitalWrite(r, HIGH);
-    digitalWrite(g, HIGH);
-    digitalWrite(b, HIGH);
-  }
-  else if (mode == 1)
-  {
-    analogWrite(r, 127);
-    analogWrite(g, 127);
-    analogWrite(b, 127);
-  }
-  else
-  {
-    digitalWrite(r, LOW);
-    digitalWrite(g, LOW);
-    digitalWrite(b, LOW);
-  }
+    analogWrite(output, brightness);
 }
 
 void doWaveAction()
 {
-    setMode(counters[0], R1_OUT, G1_OUT, B1_OUT);
-    setMode(counters[1], R2_OUT, G2_OUT, B2_OUT);
-    setMode(counters[2], R3_OUT, G3_OUT, B3_OUT);
-    for (int i = 0; i < 3; i++) {
-        if (counters[i] == 2)
+    for (int i = 0; i < 8; i++) {
+        setMode(outputs[i], brightnesses[i]);
+        if (brightnesses[i] == 255 && isUpDirection[i] || brightnesses[i] == 0 && !isUpDirection[i])
         {
-            counters[i] = 0;
+            isUpDirection[i] = !isUpDirection[i];
+        }
+        if (isUpDirection[i])
+        {
+            brightnesses[i] += 1;
         }
         else
         {
-            counters[i] += 1;
+            brightnesses[i] -= 1;
         }
     }
-    delay(250);
+    delay(10);
 }
 
 void setup()
 {
-    pinMode(R1_OUT, OUTPUT);
-    pinMode(G1_OUT, OUTPUT);
-    pinMode(B1_OUT, OUTPUT);
-    pinMode(R2_OUT, OUTPUT);
-    pinMode(G2_OUT, OUTPUT);
-    pinMode(B2_OUT, OUTPUT);
-    pinMode(R3_OUT, OUTPUT);
-    pinMode(G3_OUT, OUTPUT);
-    pinMode(B3_OUT, OUTPUT);
+    for (int i = 0; i < 8; i++)
+    {
+        pinMode(outputs[i], OUTPUT);
+    }
 }
 
 void loop() 
