@@ -7,7 +7,7 @@
 
 MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
 
-void setup() 
+void setup()
 {
   Serial.begin(115200);
   Serial.println("Press enter to start calibration");
