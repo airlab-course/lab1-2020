@@ -22,6 +22,10 @@ Button buttonB(BUTTON_B)
 
 MD_TCS230 colorSensor(S2_OUT, S3_OUT, S0_OUT, S1_OUT);
 
+bool redOn = true
+bool greenOn = true
+bool blueOn = true
+
 void setup()
 {
     Serial.begin(115200);
@@ -54,13 +58,22 @@ void loop()
   colorSensor.getRGB(&rgb);
   
   if (buttonR.wasPressed()) {
-    rgb.value[TC230_RGB_R] = 0;
+    redOn = !redOn
   }
   if (buttonG.wasPressed()) {
-    rgb.value[TC230_RGB_G] = 0;
+    greenOn = !greenOn
   }
   if (buttonB.wasPressed()) {
-    rgb.value[TC230_RGB_B] = 0
+    blueOn = !blueOn
+  }
+  if (!redOn) {
+    rgb.value[TC230_RGB_R] = 0;
+  }
+  if (!greenOn) {
+    rgb.value[TC230_RGB_G] = 0;
+  }
+  if (!blueOn) {
+    rgb.value[TC230_RGB_B] = 0;
   }
   
   print_rgb(rgb);
