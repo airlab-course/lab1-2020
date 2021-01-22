@@ -1,5 +1,6 @@
 #define PIN_LED 12  
-#define BUZZER_PIN 10 
+#define BUZZER_PIN_1 10 
+#define BUZZER_PIN_2 8
 #include "buzzer.h"
 
 int buttonPin[2] = {3, 13};
@@ -8,7 +9,8 @@ int randomNumber;
 void setup()
 {
   pinMode(PIN_LED, OUTPUT);
-  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(BUZZER_PIN_1, OUTPUT);
+  pinMode(BUZZER_PIN_2, OUTPUT);
   
   for (int player = 0; player < 2; ++player) {
     pinMode(ledPin[player], OUTPUT);
@@ -25,7 +27,14 @@ void loop()
   for (int player = 0; ; player = (player+1) % 2) {
     if (!digitalRead(buttonPin[player])) {
       digitalWrite(ledPin[player], HIGH);
-      tone(BUZZER_PIN, 4000, 1000);
+      if (player == 0)
+      {
+        tone(BUZZER_PIN_1, 4000, 1000); //играем мелодию игрока 1
+      }
+      else 
+      {
+        tone(BUZZER_PIN_2, 2000, 3000); //играем мелодию игрока 2
+      }
       digitalWrite(PIN_LED, LOW);
       delay(1000);
       digitalWrite(ledPin[player], LOW);
