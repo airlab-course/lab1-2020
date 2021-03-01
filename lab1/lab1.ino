@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <MD_TCS230.h>
+#include "button.h"
 
 #define  S0_OUT  2
 #define  S1_OUT  3
@@ -15,17 +15,24 @@ Button buttonOn(PIN_BUTTON_ON);
 
 void setup()
 {
-    
+    pinMode(R_OUT, OUTPUT);
+    pinMode(G_OUT, OUTPUT);
+    pinMode(B_OUT, OUTPUT);
 }
 
 void loop() 
 {
-    
-}
-
-void print_rgb(colorData rgb)
-{
-  
+    if (buttonOn.wasPressed())
+    {
+        for (int i = 0; i < 6; i++) 
+        {
+            set_rgb_led(255, 0, 0);
+            delay(4500);
+            set_rgb_led(255, 255, 255);
+            delay(500);
+        }
+        set_rgb_led(0, 0, 255);
+    }
 }
 
 void set_rgb_led(colorData rgb)
