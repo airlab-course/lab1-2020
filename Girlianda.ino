@@ -1,134 +1,258 @@
+#include <EEPROM.h>
+uint8_t mode=0;
+uint16_t counter; 
+uint8_t val=0; 
+bool reverse=false; 
+uint8_t cc=0; 
+int addr = 0; 
+#define pinLed 10 
 
 
-void setup() {
-  pinMode(3, OUTPUT);
-  pinMode(4, OUTPUT);
-  pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
-  pinMode(7, OUTPUT);
-}
-void loop() {
-  //Первый эффект.
-  digitalWrite(3, HIGH);
-  delay(500);              
-  digitalWrite(3, LOW);
-  delay(500);              
-  digitalWrite(4, HIGH); 
-  delay(500);              
-  digitalWrite(4, LOW); 
-  delay(500);              
-  digitalWrite(5, HIGH); 
-  delay(500);              
-  digitalWrite(5, LOW);  
-  delay(500);              
-  digitalWrite(6, HIGH); 
-  delay(500);              
-  digitalWrite(6, LOW);
-  delay(500);              
-  digitalWrite(7, HIGH);   
-  delay(500);              
-  digitalWrite(7, LOW);    
-  delay(500);              
+
+void setup(){
+
   
-  //Второй эффект.
-  digitalWrite(3, HIGH);   
-  delay(200);              
-  digitalWrite(4, HIGH);   
-  delay(200);              
-  digitalWrite(5, HIGH);   
-  delay(200);              
-  digitalWrite(6, HIGH);   
-  delay(200);              
-  digitalWrite(7, HIGH);   
-  delay(200);              
-  digitalWrite(7, LOW);   
-  delay(200);              
-  digitalWrite(6, LOW);   
-  delay(200);              
-  digitalWrite(5, LOW);   
-  delay(200);              
-  digitalWrite(4, LOW);   
-  delay(200);              
-  digitalWrite(3, LOW);   
-  delay(200);             
- 
-  //Третий эффект.
-  digitalWrite(3, HIGH);   
-  digitalWrite(4, HIGH);   
-  digitalWrite(5, HIGH);   
-  digitalWrite(6, HIGH);  
-  digitalWrite(7, HIGH);   
-  delay(1000);              
-  digitalWrite(3, LOW);    
-  digitalWrite(4, LOW);   
-  digitalWrite(5, LOW);    
-  digitalWrite(6, LOW);    
-  digitalWrite(7, LOW);    
-  delay(1000);            
-  digitalWrite(3, HIGH);   
-  digitalWrite(4, HIGH);   
-  digitalWrite(5, HIGH);   
-  digitalWrite(6, HIGH);   
-  digitalWrite(7, HIGH);   
-  delay(1000);              
-  digitalWrite(3, LOW);    
-  digitalWrite(4, LOW);    
-  digitalWrite(5, LOW);    
-  digitalWrite(6, LOW);   
-  digitalWrite(7, LOW);    
-  delay(1000);             
+  pinMode(pinLed, OUTPUT);
   
-   //Четвертый эффект.
-  digitalWrite(3, HIGH);   
-  delay(100);              
-  digitalWrite(3, LOW);   
-  delay(100);             
-  digitalWrite(4, HIGH);   
-  delay(100);              
-  digitalWrite(4, LOW);    
-  delay(100);              
-  digitalWrite(5, HIGH);   
-  delay(100);              
-  digitalWrite(5, LOW);   
-  delay(100);              
-  digitalWrite(6, HIGH);   
-  delay(100);              
-  digitalWrite(6, LOW);    
-  delay(100);              
-  digitalWrite(7, HIGH);   
-  delay(100);              
-  digitalWrite(7, LOW);    
-  delay(100);              
-  digitalWrite(6, HIGH);   
-  delay(100);              
-  digitalWrite(6, LOW);    
-  delay(100);              
-  digitalWrite(5, HIGH);   
-  delay(100);              
-  digitalWrite(5, LOW);    
-  delay(100);              
-  digitalWrite(4, HIGH);   
-  delay(100);              
-  digitalWrite(4, LOW);    
-  delay(100);              
-  digitalWrite(3, HIGH);   
-  delay(100);              
-  digitalWrite(3, LOW);    
-  delay(100);              
- 
-  //Пятый эффект.
-  digitalWrite(3, HIGH);   
-  digitalWrite(7, HIGH);  
-  delay(200);              
-  digitalWrite(4, HIGH);   
-  digitalWrite(6, HIGH);   
-  delay(200);              
-  digitalWrite(5, HIGH);    
-  delay(300);              
-  digitalWrite(3, LOW);   
-  digitalWrite(4, LOW);    
-  digitalWrite(5, LOW);    
-  digitalWrite(6, LOW);   
-  digitalWrite(7, LOW);   
-  delay(1000);             
+
+
+
+mode = EEPROM.read(0);
+
+
+if(mode==11){EEPROM.write(addr, 0);}
+
+else{
+EEPROM.write(addr, mode+1);
 }
+
+
+  }
+
+
+
+
+
+
+
+void fake_interrupt(){
+
+
+digitalWrite(pinLed,HIGH);
+
+delayMicroseconds(val);
+
+digitalWrite(pinLed,LOW);
+
+delayMicroseconds(val);
+
+
+counter=0;
+}
+
+
+
+
+
+
+
+
+  void loop(){
+ 
+
+
+switch(mode){
+
+//Режим 1
+case 0:
+
+if(!reverse){
+
+analogWrite(pinLed,val);
+delay(9);
+val++;
+
+if(val==255){reverse=true;}
+}
+
+if(reverse){
+  val--;
+  if(val==0){reverse=false;return;}
+  analogWrite(pinLed,val);
+  delay(9);
+  }
+;break;
+
+
+//Режим 2
+
+case 1:
+if(!reverse){
+analogWrite(pinLed,val);
+delay(1);
+val++;
+if(val==255){reverse=true;}
+}
+
+
+if(reverse){
+  val--;
+  if(val==0){reverse=false;return;}
+  analogWrite(pinLed,val);
+  delay(1);
+  }
+
+;break;
+
+//Режим 3
+
+case 2:
+digitalWrite(pinLed,HIGH);
+delay(500);
+digitalWrite(pinLed,LOW);
+delay(500);  
+
+;break;
+
+//Режим 4
+
+case 3:
+  digitalWrite(pinLed,HIGH);
+  delay(20);
+  digitalWrite(pinLed,LOW);
+  delay(20);
+;break;
+
+
+//Режим 5
+case 4:
+
+counter++;
+
+ if(counter>=512){fake_interrupt();delay(33);val++;}
+  
+  
+;break;
+
+//Режим 6
+case 5:
+
+for(int i=0;i<127;i++){
+analogWrite(pinLed,i);
+delay(10);
+}
+
+//Ждать 50 мс
+
+analogWrite(pinLed,255);
+
+delay(50);
+
+for(int i=127;i>0;i--){
+analogWrite(pinLed,i);
+delay(10);
+}
+
+delay(50);
+analogWrite(pinLed,0);
+delay(50);
+
+
+;break;
+
+//Быстрое мигание
+ case 6:
+  digitalWrite(pinLed,HIGH);
+  delay(55);
+  digitalWrite(pinLed,LOW);
+  delay(55);
+;break;
+
+
+//Ступенька
+case 7:
+analogWrite(pinLed,0);
+delay(200);
+
+analogWrite(pinLed,255);
+delay(200);
+analogWrite(pinLed,127);
+delay(200);
+analogWrite(pinLed,127);
+delay(200);
+
+
+analogWrite(pinLed,255);
+delay(200);
+analogWrite(pinLed,127);
+delay(200);
+analogWrite(pinLed,63);
+delay(200);
+
+break;
+
+
+//Биение сердца
+case 8:
+
+analogWrite(pinLed,63);
+delay(200);
+analogWrite(pinLed,127);
+delay(200);
+
+analogWrite(pinLed,50);
+delay(400);
+
+analogWrite(pinLed,63);
+delay(200);
+analogWrite(pinLed,127);
+delay(200);
+
+break;
+
+//Лампа с плохим контактом
+case 9:
+
+for(int i=0;i<94;i++){
+  
+analogWrite(pinLed,i);
+delay(20);
+}
+
+analogWrite(pinLed,0);
+delay(999);
+break;
+
+//Среднее переливание/волна
+case 10:
+
+for(int i=32;i<190;i++){
+analogWrite(pinLed,i);
+delay(15);
+}
+
+
+
+for(int i=190;i>32;i--){
+analogWrite(pinLed,i);
+delay(15);
+}
+
+
+break;
+
+//Светодиод светиться 7 секунд, 7 секунд не светится
+case 11:
+
+analogWrite(pinLed,255);
+delay(7000);
+
+analogWrite(pinLed,0);
+delay(7000);
+
+break;
+
+  }//switch
+
+    
+ }//loop
